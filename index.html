@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="_ds/nocturne-bd5d277d-c731-4eaf-beab-3d8bdec9b190/styles.css">
+<script src="_ds/nocturne-bd5d277d-c731-4eaf-beab-3d8bdec9b190/_ds_bundle.js"></script>
+<style>html,body{margin:0;height:100%;background:#161826;}a{color:#b5abfc;}a:hover{color:#d2cefd;}select option{background:#232532;color:#e9e9ed;}button{font-family:inherit;}</style>
+</helmet>
+<div style="display:flex;height:100vh;font-family:var(--font-body);color:var(--color-text);background:var(--color-bg);overflow:hidden;">
+  <aside style="width:232px;flex-shrink:0;background:#1b1d2c;border-right:1px solid var(--color-neutral-800);padding:20px 12px;display:flex;flex-direction:column;gap:4px;box-sizing:border-box;">
+    <div style="display:flex;align-items:center;gap:10px;padding:0 8px 20px;">
+      <div style="width:30px;height:30px;border-radius:7px;box-shadow:inset 0 0 0 2px var(--color-accent);display:flex;align-items:center;justify-content:center;"><i class="ph ph-shield-check" style="font-size:17px;color:var(--color-accent-300);"></i></div>
+      <span style="font-size:19px;font-weight:500;letter-spacing:-0.01em;">{{ appName }}</span>
+    </div>
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="3">
+      <button type="button" onClick="{{ n.go }}" style="display:flex;align-items:center;gap:10px;padding:9px 10px;border:0;border-radius:8px;font-size:14px;text-align:left;cursor:pointer;background:{{ n.bg }};color:{{ n.color }};" style-hover="background:#2a2c3c;">
+        <i class="ph {{ n.icon }}" style="font-size:18px;"></i><span>{{ n.label }}</span>
+      </button>
+    </sc-for>
+    <div style="margin-top:auto;display:flex;align-items:center;gap:10px;padding:12px 8px 0;border-top:1px solid var(--color-neutral-800);">
+      <div style="width:30px;height:30px;border-radius:15px;background:var(--color-neutral-800);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--color-neutral-300);">VR</div>
+      <div style="display:flex;flex-direction:column;min-width:0;">
+        <span style="font-size:13px;">Verifikator</span>
+        <span style="font-size:12px;color:var(--color-neutral-500);">Kantor Cabang {{ provLabel }}</span>
+      </div>
+    </div>
+  </aside>
+
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column;">
+    <header style="height:60px;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:0 28px;border-bottom:1px solid var(--color-neutral-800);">
+      <span style="font-size:14px;color:var(--color-neutral-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Deteksi dini kepatuhan pemberi kerja · BPJS Kesehatan</span>
+      <sc-if value="{{ hasProv }}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{ goProv }}" style="margin-left:auto;display:flex;align-items:center;gap:8px;padding:6px 12px;border:0;border-radius:999px;background:transparent;box-shadow:inset 0 0 0 1px var(--color-neutral-700);color:var(--color-neutral-200);font-size:13px;cursor:pointer;white-space:nowrap;" style-hover="box-shadow:inset 0 0 0 1px var(--color-accent);">
+          <i class="ph ph-map-pin" style="font-size:14px;color:var(--color-accent-300);"></i><span>{{ prov }}</span><i class="ph ph-caret-down" style="font-size:12px;color:var(--color-neutral-400);"></i>
+        </button>
+      </sc-if>
+      <div style="margin-left:{{ pillMargin }};display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--color-neutral-900);font-size:13px;color:var(--color-neutral-300);white-space:nowrap;">
+        <div style="width:7px;height:7px;border-radius:4px;background:var(--color-accent-400);"></div><span>Data per {{ year }} {{ q }}</span>
+      </div>
+    </header>
+
+    <div style="flex:1;min-height:0;overflow:auto;">
+
+      <sc-if value="{{ isProv }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:32px 28px;display:flex;flex-direction:column;gap:20px;min-height:100%;box-sizing:border-box;">
+          <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <h1 style="margin:0;font-size:28px;font-weight:500;letter-spacing:-0.015em;">Pilih provinsi</h1>
+              <span style="font-size:15px;color:var(--color-neutral-400);">Badan usaha dibandingkan dengan peer group dalam satu provinsi.</span>
+            </div>
+            <label style="margin-left:auto;width:340px;max-width:100%;height:40px;border-radius:8px;box-shadow:inset 0 0 0 1px var(--color-neutral-700);display:flex;align-items:center;gap:8px;padding:0 12px;box-sizing:border-box;">
+              <i class="ph ph-magnifying-glass" style="font-size:16px;color:var(--color-neutral-500);"></i>
+              <input value="{{ provQuery }}" onChange="{{ onProvQuery }}" placeholder="Cari provinsi" style="flex:1;min-width:0;background:transparent;border:0;outline:none;color:var(--color-text);font-size:14px;font-family:inherit;">
+              <span style="font-size:12px;color:var(--color-neutral-500);white-space:nowrap;">{{ provCount }} provinsi</span>
+            </label>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;">
+            <sc-for list="{{ provItems }}" as="p" hint-placeholder-count="20">
+              <button type="button" onClick="{{ p.pick }}" onDoubleClick="{{ p.open }}" style="display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;border:0;border-radius:8px;font-size:14px;text-align:left;cursor:pointer;background:{{ p.bg }};box-shadow:inset 0 0 0 1px {{ p.border }};color:{{ p.color }};" style-hover="box-shadow:inset 0 0 0 1px var(--color-accent-700);">
+                <i class="ph ph-map-pin" style="font-size:16px;color:{{ p.icon }};"></i>
+                <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ p.name }}</span>
+                <span style="font-size:12px;color:var(--color-neutral-500);">{{ p.count }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="margin-top:auto;display:flex;align-items:center;gap:12px;padding-top:12px;">
+            <span style="font-size:14px;color:var(--color-neutral-300);">{{ pickLabel }}</span>
+            <button type="button" onClick="{{ openDash }}" disabled="{{ noPick }}" style="margin-left:auto;display:flex;align-items:center;gap:8px;padding:10px 18px;border:0;border-radius:8px;font-size:14px;background:transparent;box-shadow:inset 0 0 0 1px var(--color-accent);color:var(--color-accent-300);cursor:pointer;opacity:{{ openOpacity }};" style-hover="background:var(--color-accent-900);" style-active="background:var(--color-accent-800);">
+              <span>Buka dasbor</span><i class="ph ph-arrow-right" style="font-size:15px;"></i>
+            </button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:26px 28px 32px;display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;">
+            <h1 style="margin:0;font-size:28px;font-weight:500;letter-spacing:-0.015em;">Dasbor badan usaha</h1>
+            <span style="font-size:14px;color:var(--color-neutral-400);">{{ listCountLabel }} · Provinsi {{ prov }} · {{ year }} {{ q }}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
+            <label style="display:flex;align-items:center;gap:8px;height:38px;padding:0 10px 0 12px;border-radius:8px;box-shadow:inset 0 0 0 1px var(--color-neutral-700);font-size:14px;">
+              <i class="ph ph-calendar-blank" style="font-size:16px;color:var(--color-neutral-400);"></i><span style="color:var(--color-neutral-400);">Tahun</span>
+              <select value="{{ year }}" onChange="{{ onYear }}" style="background:transparent;border:0;outline:none;color:var(--color-text);font-size:14px;font-family:inherit;cursor:pointer;">
+                <option value="2026">2026</option><option value="2025">2025</option><option value="2024">2024</option>
+              </select>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;height:38px;padding:0 10px 0 12px;border-radius:8px;box-shadow:inset 0 0 0 1px var(--color-neutral-700);font-size:14px;">
+              <i class="ph ph-chart-pie-slice" style="font-size:16px;color:var(--color-neutral-400);"></i><span style="color:var(--color-neutral-400);">Kuartal</span>
+              <select value="{{ q }}" onChange="{{ onQ }}" style="background:transparent;border:0;outline:none;color:var(--color-text);font-size:14px;font-family:inherit;cursor:pointer;">
+                <option value="Q1">Q1</option><option value="Q2">Q2</option><option value="Q3">Q3</option><option value="Q4">Q4</option>
+              </select>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;height:38px;padding:0 10px 0 12px;border-radius:8px;box-shadow:inset 0 0 0 1px var(--color-neutral-700);font-size:14px;">
+              <i class="ph ph-factory" style="font-size:16px;color:var(--color-neutral-400);"></i><span style="color:var(--color-neutral-400);">Sektor</span>
+              <select value="{{ sector }}" onChange="{{ onSector }}" style="background:transparent;border:0;outline:none;color:var(--color-text);font-size:14px;font-family:inherit;cursor:pointer;">
+                <option value="Semua sektor">Semua sektor</option><option value="Industri pengolahan">Industri pengolahan</option><option value="Perdagangan">Perdagangan</option><option value="Konstruksi">Konstruksi</option><option value="Pertanian">Pertanian</option>
+              </select>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;height:38px;width:220px;padding:0 12px;border-radius:8px;box-shadow:inset 0 0 0 1px var(--color-neutral-700);box-sizing:border-box;">
+              <i class="ph ph-magnifying-glass" style="font-size:16px;color:var(--color-neutral-500);"></i>
+              <input value="{{ search }}" onChange="{{ onSearch }}" placeholder="Cari ID badan usaha" style="flex:1;min-width:0;background:transparent;border:0;outline:none;color:var(--color-text);font-size:14px;font-family:inherit;">
+            </label>
+            <div style="margin-left:auto;display:flex;gap:4px;padding:4px;border-radius:8px;background:var(--color-neutral-900);">
+              <sc-for list="{{ segs }}" as="s" hint-placeholder-count="2">
+                <button type="button" onClick="{{ s.go }}" style="padding:7px 14px;border:0;border-radius:6px;font-size:13px;white-space:nowrap;cursor:pointer;background:{{ s.bg }};box-shadow:{{ s.shadow }};color:{{ s.color }};" style-hover="color:var(--color-accent-200);">{{ s.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:var(--color-surface);border-radius:8px;box-shadow:var(--shadow-sm);overflow-x:auto;">
+            <div style="min-width:980px;">
+              <div style="display:grid;grid-template-columns:56px 1.25fr 1.3fr 1.4fr 1.2fr 1.5fr 1.4fr;gap:12px;padding:12px 22px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--color-neutral-400);border-bottom:1px solid var(--color-neutral-800);">
+                <span>Rank</span><span>ID badan usaha</span><span>Subsektor</span><span>Hit point</span><span>Keterangan</span><span>Jenis indikasi</span><span>Status</span>
+              </div>
+              <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+                <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:56px 1.25fr 1.3fr 1.4fr 1.2fr 1.5fr 1.4fr;gap:12px;align-items:center;padding:0 22px;height:60px;border-top:1px solid var(--color-neutral-800);cursor:pointer;" style-hover="background:#2a2c3c;">
+                  <span style="font-size:15px;color:var(--color-neutral-400);">#{{ r.rank }}</span>
+                  <span style="font-size:15px;font-variant-numeric:tabular-nums;">{{ r.id }}</span>
+                  <span style="font-size:14px;color:var(--color-neutral-300);">{{ r.sub }}</span>
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="display:flex;gap:4px;">
+                      <sc-for list="{{ r.boxes }}" as="b" hint-placeholder-count="5">
+                        <div style="width:13px;height:13px;border-radius:3px;background:{{ b.bg }};box-shadow:inset 0 0 0 1.5px {{ b.border }};"></div>
+                      </sc-for>
+                    </div>
+                    <span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;color:{{ r.hitColor }};">{{ r.hit }}/5</span>
+                  </div>
+                  <div><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:13px;font-weight:500;white-space:nowrap;background:{{ r.tagBg }};color:{{ r.tagColor }};box-shadow:inset 0 0 0 1px {{ r.tagBorder }};"><i class="ph {{ r.tierIcon }}" style="font-size:13px;"></i>{{ r.tier }}</span></div>
+                  <span style="font-size:14px;color:{{ r.jenisColor }};">{{ r.jenis }}</span>
+                  <span style="font-size:14px;color:{{ r.statusColor }};">{{ r.status }}</span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ emptyRows }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:32px 22px;font-size:14px;color:var(--color-neutral-400);border-top:1px solid var(--color-neutral-800);">Tidak ada badan usaha yang cocok dengan filter.</div>
+              </sc-if>
+              <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ false }}">
+                <button type="button" onClick="{{ showMore }}" style="display:flex;align-items:center;gap:8px;width:100%;padding:14px 22px;border:0;border-top:1px solid var(--color-neutral-800);background:transparent;color:var(--color-accent-300);font-size:14px;cursor:pointer;text-align:left;" style-hover="background:var(--color-accent-900);"><i class="ph ph-caret-down" style="font-size:14px;"></i><span>{{ moreLabel }}</span></button>
+              </sc-if>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--color-neutral-400);">
+            <div style="width:2px;height:14px;background:var(--color-neutral-400);flex-shrink:0;"></div>
+            <span>Hit point = jumlah dari 5 juri yang menandai. ≥ {{ thr }}/5 = terindikasi anomali; diurutkan dari hit point terbesar. Klik baris untuk detail.</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:22px 28px 32px;display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <button type="button" onClick="{{ goBack }}" style="align-self:flex-start;display:flex;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:var(--color-neutral-500);font-size:13px;cursor:pointer;" style-hover="color:var(--color-accent-300);"><i class="ph ph-arrow-left" style="font-size:13px;"></i><span>{{ crumb }}</span></button>
+              <h1 style="margin:0;font-size:30px;font-weight:500;letter-spacing:-0.02em;">{{ d.id }}</h1>
+              <span style="font-size:14px;color:var(--color-neutral-400);">{{ prov }} · {{ d.sub }} · Payroll Group {{ d.pg }}</span>
+            </div>
+            <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:13px;font-weight:500;background:{{ d.tagBg }};color:{{ d.tagColor }};box-shadow:inset 0 0 0 1px {{ d.tagBorder }};"><i class="ph {{ d.tierIcon }}" style="font-size:14px;"></i>{{ d.headTag }}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(460px,100%),1fr));gap:16px;">
+            <div style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+              <div style="background:var(--color-surface);border-radius:8px;box-shadow:var(--shadow-sm);padding:20px 22px;display:flex;flex-wrap:wrap;align-items:center;gap:24px;">
+                <div style="position:relative;width:124px;height:124px;flex-shrink:0;">
+                  <svg width="124" height="124" viewBox="0 0 124 124" style="display:block;transform:rotate(-90deg);">
+                    <circle cx="62" cy="62" r="52" fill="none" stroke-width="9" stroke="{{ d.seg0 }}" style="stroke-dasharray:57.3 400;stroke-dashoffset:0;"></circle>
+                    <circle cx="62" cy="62" r="52" fill="none" stroke-width="9" stroke="{{ d.seg1 }}" style="stroke-dasharray:57.3 400;stroke-dashoffset:-65.3;"></circle>
+                    <circle cx="62" cy="62" r="52" fill="none" stroke-width="9" stroke="{{ d.seg2 }}" style="stroke-dasharray:57.3 400;stroke-dashoffset:-130.6;"></circle>
+                    <circle cx="62" cy="62" r="52" fill="none" stroke-width="9" stroke="{{ d.seg3 }}" style="stroke-dasharray:57.3 400;stroke-dashoffset:-195.9;"></circle>
+                    <circle cx="62" cy="62" r="52" fill="none" stroke-width="9" stroke="{{ d.seg4 }}" style="stroke-dasharray:57.3 400;stroke-dashoffset:-261.2;"></circle>
+                  </svg>
+                  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                    <span style="font-size:34px;font-weight:500;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:{{ d.hitColor }};">{{ d.hit }}/5</span>
+                    <span style="font-size:12px;color:var(--color-neutral-400);">hit point</span>
+                  </div>
+                </div>
+                <div style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:7px;">
+                  <span style="font-size:13px;color:var(--color-neutral-400);">Penilaian lima juri</span>
+                  <sc-for list="{{ d.juri }}" as="j" hint-placeholder-count="5">
+                    <div style="display:flex;align-items:center;gap:8px;font-size:14px;">
+                      <i class="ph {{ j.icon }}" style="font-size:17px;color:{{ j.iconColor }};"></i>
+                      <span style="color:{{ j.color }};">{{ j.name }}</span>
+                      <span style="margin-left:auto;font-size:12px;color:var(--color-neutral-400);text-align:right;">{{ j.why }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="background:var(--color-surface);border-radius:8px;box-shadow:var(--shadow-sm);padding:22px;display:flex;flex-direction:column;gap:16px;">
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                  <span style="font-size:18px;font-weight:500;">Profil peer group</span>
+                  <span style="font-size:13px;color:var(--color-neutral-400);">{{ prov }} · KBLI {{ d.sub }} · Payroll Group {{ d.pg }}</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:32px;">
+                  <div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:12px;color:var(--color-neutral-400);">Median pekerja terdaftar</span><span style="font-size:18px;">{{ d.med }} pekerja</span></div>
+                  <div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:12px;color:var(--color-neutral-400);">Median PRW</span><span style="font-size:18px;">Rp{{ d.medPrw }} jt / pekerja / tahun</span></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <span style="font-size:13px;color:var(--color-neutral-300);">Sebaran peer group · {{ d.peerN }} badan usaha</span>
+                  <div style="display:flex;gap:8px;">
+                    <div style="width:16px;display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(-90deg);white-space:nowrap;font-size:12px;color:var(--color-neutral-300);">RPR</span></div>
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;">
+                      <div style="display:flex;gap:8px;height:230px;">
+                        <div style="width:14px;position:relative;font-size:12px;color:var(--color-neutral-400);">
+                          <span style="position:absolute;right:0;bottom:-7px;">0</span><span style="position:absolute;right:0;bottom:calc(25% - 7px);">1</span><span style="position:absolute;right:0;bottom:calc(50% - 7px);">2</span><span style="position:absolute;right:0;bottom:calc(75% - 7px);">3</span><span style="position:absolute;right:0;bottom:calc(100% - 7px);">4</span>
+                        </div>
+                        <div style="flex:1;position:relative;border-left:1px solid var(--color-neutral-600);border-bottom:1px solid var(--color-neutral-600);">
+                          <div style="position:absolute;left:0;right:0;bottom:50%;height:1px;background:var(--color-neutral-800);"></div>
+                          <div style="position:absolute;left:0;right:0;bottom:75%;height:1px;background:var(--color-neutral-800);"></div>
+                          <div style="position:absolute;left:0;right:0;bottom:100%;height:1px;background:var(--color-neutral-800);"></div>
+                          <div style="position:absolute;top:0;bottom:0;left:25%;width:1px;background:var(--color-neutral-800);"></div>
+                          <div style="position:absolute;top:0;bottom:0;left:75%;width:1px;background:var(--color-neutral-800);"></div>
+                          <div style="position:absolute;top:0;bottom:0;left:100%;width:1px;background:var(--color-neutral-800);"></div>
+                          <sc-for list="{{ d.peers }}" as="pt" hint-placeholder-count="0">
+                            <div style="position:absolute;left:calc({{ pt.x }} - 5px);bottom:calc({{ pt.y }} - 5px);width:10px;height:10px;border-radius:5px;background:var(--color-neutral-500);opacity:0.85;"></div>
+                          </sc-for>
+                          <div style="position:absolute;left:50%;top:0;bottom:0;border-left:2px dashed var(--color-neutral-400);"></div>
+                          <div style="position:absolute;left:0;right:0;bottom:25%;border-top:2px dashed var(--color-neutral-400);"></div>
+                          <span style="position:absolute;left:calc(50% + 6px);bottom:4px;font-size:11px;color:var(--color-neutral-300);">median R_reg 1,00</span>
+                          <span style="position:absolute;right:6px;bottom:calc(25% + 4px);font-size:11px;color:var(--color-neutral-300);">median RPR 1,00</span>
+                          <div style="position:absolute;left:calc({{ d.px }} - 8px);bottom:calc({{ d.py }} - 8px);width:16px;height:16px;border-radius:8px;background:var(--color-accent-300);box-shadow:0 0 0 5px var(--color-accent-800);"></div>
+                          <div style="position:absolute;left:{{ d.px }};bottom:calc({{ d.py }} - 13px);transform:{{ d.labelShift }};padding:4px 8px;border-radius:6px;background:var(--color-accent-900);box-shadow:inset 0 0 0 1px var(--color-accent-700);font-size:12px;color:var(--color-accent-200);white-space:nowrap;">{{ d.id }} · ({{ d.rregTxt }} ; {{ d.rprTxt }})</div>
+                        </div>
+                      </div>
+                      <div style="position:relative;height:16px;margin-left:22px;font-size:12px;color:var(--color-neutral-400);">
+                        <span style="position:absolute;left:0;transform:translateX(-50%);">0,0</span><span style="position:absolute;left:25%;transform:translateX(-50%);">0,5</span><span style="position:absolute;left:50%;transform:translateX(-50%);">1,0</span><span style="position:absolute;left:75%;transform:translateX(-50%);">1,5</span><span style="position:absolute;left:100%;transform:translateX(-50%);">2,0</span>
+                      </div>
+                      <span style="margin-left:22px;text-align:center;font-size:12px;color:var(--color-neutral-300);">Registration Ratio (R_reg)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+              <div style="background:var(--color-surface);border-radius:8px;box-shadow:var(--shadow-sm);padding:22px;display:flex;flex-direction:column;gap:14px;">
+                <span style="font-size:18px;font-weight:500;">Rincian indikator</span>
+                <div style="display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-radius:8px;background:#1d1f2c;box-shadow:inset 0 0 0 1px var(--color-neutral-800);">
+                  <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:15px;color:var(--color-neutral-300);">Registration Ratio (R_reg)</span><span style="margin-left:auto;font-size:24px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--color-accent-300);">{{ d.rregTxt }}</span></div>
+                  <div style="position:relative;height:7px;border-radius:4px;background:var(--color-neutral-800);"><div style="width:{{ d.rregBar }};height:100%;border-radius:4px;background:var(--color-accent);"></div><div style="position:absolute;left:50%;top:-5px;bottom:-5px;width:2px;background:var(--color-neutral-300);"></div></div>
+                  <span style="font-size:13px;color:var(--color-neutral-400);">{{ d.reg }} pekerja terdaftar vs median peer {{ d.med }} · Gap_reg {{ d.gapTxt }}</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-radius:8px;background:#1d1f2c;box-shadow:inset 0 0 0 1px var(--color-neutral-800);">
+                  <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:15px;color:var(--color-neutral-300);">Relative Payroll Ratio (RPR)</span><span style="margin-left:auto;font-size:24px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--color-accent-300);">{{ d.rprTxt }}×</span></div>
+                  <div style="position:relative;height:7px;border-radius:4px;background:var(--color-neutral-800);"><div style="width:{{ d.rprBar }};height:100%;border-radius:4px;background:var(--color-accent);"></div><div style="position:absolute;left:25%;top:-5px;bottom:-5px;width:2px;background:var(--color-neutral-300);"></div></div>
+                  <span style="font-size:13px;color:var(--color-neutral-400);">PRW Rp{{ d.prw }} jt vs median peer Rp{{ d.medPrw }} jt per pekerja / tahun</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:8px;background:var(--color-accent-900);box-shadow:inset 0 0 0 1px var(--color-accent-800);">
+                  <div style="display:flex;align-items:center;gap:8px;"><i class="ph ph-info" style="font-size:19px;color:var(--color-accent-300);"></i><span style="font-size:15px;font-weight:500;color:var(--color-accent-200);">{{ d.whyTitle }}</span></div>
+                  <span style="font-size:14px;line-height:1.5;color:var(--color-neutral-200);text-wrap:pretty;">{{ d.why }}</span>
+                  <span style="font-size:13px;color:var(--color-accent-300);">Rekomendasi: {{ d.rec }}</span>
+                </div>
+              </div>
+              <div style="background:var(--color-surface);border-radius:8px;box-shadow:var(--shadow-sm);padding:22px;display:flex;flex-direction:column;gap:14px;">
+                <div style="display:flex;align-items:baseline;gap:10px;">
+                  <span style="font-size:18px;font-weight:500;">Status verifikasi</span>
+                  <span style="margin-left:auto;font-size:13px;color:{{ d.savedColor }};">{{ d.savedLabel }}</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:8px;background:var(--color-neutral-900);align-self:flex-start;">
+                  <sc-for list="{{ results }}" as="o" hint-placeholder-count="3">
+                    <button type="button" onClick="{{ o.go }}" style="padding:7px 12px;border:0;border-radius:6px;font-size:13px;white-space:nowrap;cursor:pointer;background:{{ o.bg }};box-shadow:{{ o.shadow }};color:{{ o.color }};" style-hover="color:var(--color-accent-200);">{{ o.label }}</button>
+                  </sc-for>
+                </div>
+                <textarea value="{{ note }}" onChange="{{ onNote }}" placeholder="Catatan hasil kunjungan lapangan (opsional)" rows="3" style="resize:vertical;background:transparent;border:0;border-radius:8px;box-shadow:inset 0 0 0 1px var(--color-neutral-700);padding:10px 12px;color:var(--color-text);font-size:14px;font-family:inherit;outline:none;" style-focus="box-shadow:inset 0 0 0 1px var(--color-accent);"></textarea>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <span style="font-size:12px;color:var(--color-neutral-500);">Hasil verifikasi menjadi umpan balik kalibrasi model.</span>
+                  <button type="button" onClick="{{ save }}" disabled="{{ noDraft }}" style="margin-left:auto;padding:9px 18px;border:0;border-radius:8px;font-size:14px;white-space:nowrap;background:transparent;box-shadow:inset 0 0 0 1px var(--color-accent);color:var(--color-accent-300);cursor:pointer;opacity:{{ saveOpacity }};" style-hover="background:var(--color-accent-900);" style-active="background:var(--color-accent-800);">Simpan hasil</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPeer }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:26px 28px 32px;display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <h1 style="margin:0;font-size:28px;font-weight:500;letter-spacing:-0.015em;">Peer group</h1>
+            <span style="font-size:14px;color:var(--color-neutral-400);">Provinsi {{ prov }} · wilayah + KBLI + skala payroll.</span>
+          </div>
+          <div style="background:var(--color-surface);border-radius:8px;box-shadow:var(--shadow-sm);overflow-x:auto;">
+            <div style="min-width:820px;">
+              <div style="display:grid;grid-template-columns:1.6fr 1.4fr 1fr 1fr 1.2fr 1.4fr 1fr;gap:12px;padding:12px 22px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--color-neutral-400);border-bottom:1px solid var(--color-neutral-800);">
+                <span>KBLI</span><span>Sektor</span><span>Payroll group</span><span>Anggota</span><span>Median pekerja</span><span>Median PRW</span><span>Anomali</span>
+              </div>
+              <sc-for list="{{ groups }}" as="g" hint-placeholder-count="10">
+                <div style="display:grid;grid-template-columns:1.6fr 1.4fr 1fr 1fr 1.2fr 1.4fr 1fr;gap:12px;align-items:center;padding:0 22px;height:52px;border-top:1px solid var(--color-neutral-800);font-size:14px;">
+                  <span>{{ g.name }}</span>
+                  <span style="color:var(--color-neutral-300);">{{ g.sector }}</span>
+                  <span style="color:var(--color-neutral-300);">Group {{ g.pg }}</span>
+                  <span style="font-variant-numeric:tabular-nums;color:var(--color-neutral-300);">{{ g.n }} BU</span>
+                  <span style="font-variant-numeric:tabular-nums;color:var(--color-neutral-300);">{{ g.med }}</span>
+                  <span style="font-variant-numeric:tabular-nums;color:var(--color-neutral-300);">Rp{{ g.medPrw }} jt</span>
+                  <span style="font-variant-numeric:tabular-nums;color:{{ g.anomColor }};">{{ g.anom }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isGroup }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:22px 28px 32px;display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <button type="button" onClick="{{ goPeer }}" style="align-self:flex-start;display:flex;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:var(--color-neutral-500);font-size:13px;cursor:pointer;" style-hover="color:var(--color-accent-300);"><i class="ph ph-arrow-left" style="font-size:13px;"></i><span>Peer group / {{ prov }}</span></button>
+            <h1 style="margin:0;font-size:28px;font-weight:500;letter-spacing:-0.015em;">{{ gd.name }}</h1>
+            <span style="font-size:14px;color:var(--color-neutral-400);">{{ prov }} · {{ gd.sector }} · Payroll Group {{ gd.pg }}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;">
+            <div style="background:var(--color-surface);border-radius:8px;box-shadow:var(--shadow-sm);padding:14px 18px;display:flex;flex-direction:column;gap:4px;min-width:150px;"><span style="font-size:12px;color:var(--color-neutral-400);">Anggota</span><span style="font-size:20px;font-variant-numeric:tabular-nums;">{{ gd.n }} BU</span></div>
+            <div style="background:var(--color-surface);border-radius:8px;box-shadow:var(--shadow-sm);padding:14px 18px;display:flex;flex-direction:column;gap:4px;min-width:150px;"><span style="font-size:12px;color:var(--color-neutral-400);">Median pekerja terdaftar</span><span style="font-size:20px;font-variant-numeric:tabular-nums;">{{ gd.med }} pekerja</span></div>
+            <div style="background:var(--color-surface);border-radius:8px;box-shadow:var(--shadow-sm);padding:14px 18px;display:flex;flex-direction:column;gap:4px;min-width:150px;"><span style="font-size:12px;color:var(--color-neutral-400);">Median PRW</span><span style="font-size:20px;font-variant-numeric:tabular-nums;">Rp{{ gd.medPrw }} jt</span></div>
+            <div style="background:var(--color-surface);border-radius:8px;box-shadow:var(--shadow-sm);padding:14px 18px;display:flex;flex-direction:column;gap:4px;min-width:150px;"><span style="font-size:12px;color:var(--color-neutral-400);">Terindikasi anomali</span><span style="font-size:20px;font-variant-numeric:tabular-nums;color:{{ gd.anomColor }};">{{ gd.anom }}</span></div>
+          </div>
+          <div style="background:var(--color-surface);border-radius:8px;box-shadow:var(--shadow-sm);overflow-x:auto;">
+            <div style="min-width:940px;">
+              <div style="display:grid;grid-template-columns:56px 1.3fr 1fr 0.8fr 0.8fr 1.4fr 1.2fr 1.4fr;gap:12px;padding:12px 22px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--color-neutral-400);border-bottom:1px solid var(--color-neutral-800);">
+                <span>Rank</span><span>ID badan usaha</span><span>Pekerja</span><span>R_reg</span><span>RPR</span><span>Hit point</span><span>Keterangan</span><span>Status</span>
+              </div>
+              <sc-for list="{{ members }}" as="m" hint-placeholder-count="8">
+                <div onClick="{{ m.open }}" style="display:grid;grid-template-columns:56px 1.3fr 1fr 0.8fr 0.8fr 1.4fr 1.2fr 1.4fr;gap:12px;align-items:center;padding:0 22px;height:56px;border-top:1px solid var(--color-neutral-800);cursor:pointer;font-size:14px;" style-hover="background:#2a2c3c;">
+                  <span style="color:var(--color-neutral-400);">#{{ m.rank }}</span>
+                  <span style="font-size:15px;font-variant-numeric:tabular-nums;">{{ m.id }}</span>
+                  <span style="font-variant-numeric:tabular-nums;color:var(--color-neutral-300);">{{ m.reg }}</span>
+                  <span style="font-variant-numeric:tabular-nums;color:var(--color-neutral-300);">{{ m.rregTxt }}</span>
+                  <span style="font-variant-numeric:tabular-nums;color:var(--color-neutral-300);">{{ m.rprTxt }}×</span>
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="display:flex;gap:4px;">
+                      <sc-for list="{{ m.boxes }}" as="b" hint-placeholder-count="5">
+                        <div style="width:13px;height:13px;border-radius:3px;background:{{ b.bg }};box-shadow:inset 0 0 0 1.5px {{ b.border }};"></div>
+                      </sc-for>
+                    </div>
+                    <span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;color:{{ m.hitColor }};">{{ m.hit }}/5</span>
+                  </div>
+                  <div><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:13px;font-weight:500;white-space:nowrap;background:{{ m.tagBg }};color:{{ m.tagColor }};box-shadow:inset 0 0 0 1px {{ m.tagBorder }};"><i class="ph {{ m.tierIcon }}" style="font-size:13px;"></i>{{ m.tier }}</span></div>
+                  <span style="color:{{ m.statusColor }};">{{ m.status }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--color-neutral-400);">
+            <div style="width:2px;height:14px;background:var(--color-neutral-400);flex-shrink:0;"></div>
+            <span>Rank mengikuti urutan di dasbor provinsi. Klik baris untuk detail badan usaha.</span>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </main>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;right:28px;bottom:28px;display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:8px;background:#262838;box-shadow:var(--shadow-md);font-size:14px;">
+      <i class="ph ph-check-circle" style="font-size:22px;color:var(--color-accent-300);"></i>
+      <div style="display:flex;flex-direction:column;gap:2px;"><span>Hasil verifikasi tersimpan</span><span style="font-size:12px;color:var(--color-neutral-400);">{{ toastSub }}</span></div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;appName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;JagaPPU&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Produk&quot;},&quot;threshold&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:3,&quot;min&quot;:1,&quot;max&quot;:5,&quot;step&quot;:1,&quot;unit&quot;:&quot;/5&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Model&quot;}}">
+const PROVS = ['Aceh','Bali','Banten','Bengkulu','DI Yogyakarta','DKI Jakarta','Gorontalo','Jambi','Jawa Barat','Jawa Tengah','Jawa Timur','Kalimantan Barat','Kalimantan Selatan','Kalimantan Tengah','Kalimantan Timur','Kalimantan Utara','Kep. Bangka Belitung','Kepulauan Riau','Lampung','Maluku','Maluku Utara','Nusa Tenggara Barat','Nusa Tenggara Timur','Papua','Papua Barat','Papua Barat Daya','Papua Pegunungan','Papua Selatan','Papua Tengah','Riau','Sulawesi Barat','Sulawesi Selatan','Sulawesi Tengah','Sulawesi Tenggara','Sulawesi Utara','Sumatera Barat','Sumatera Selatan','Sumatera Utara'];
+const GROUPS = [
+  ['Tekstil','Industri pengolahan','C',40,96,98], ['Makanan & minuman','Industri pengolahan','D',52,200,92], ['Kimia','Industri pengolahan','C',18,120,105],
+  ['Kertas','Industri pengolahan','D',12,135,100], ['Logam','Industri pengolahan','B',27,58,100], ['Ritel','Perdagangan','B',64,80,78],
+  ['Grosir','Perdagangan','B',31,60,80], ['Konstruksi gedung','Konstruksi','B',22,92,90], ['Konstruksi jalan','Konstruksi','B',15,66,90], ['Perkebunan sawit','Pertanian','E',9,310,82],
+];
+const G = Object.fromEntries(GROUPS.map(g => [g[0], { sector: g[1], pg: g[2], med: g[4], medPrw: g[5] }]));
+// id, subsektor, juri hits, jenis, pekerja terdaftar, PRW (jt/pekerja/tahun)
+const RAW = [
+  ['BU-2026-0891','Tekstil',[1,1,1,1,1],'PDUK',25,380], ['BU-2026-0412','Tekstil',[1,1,1,0,1],'PDUK',40,250],
+  ['BU-2026-1102','Makanan & minuman',[1,1,0,1,1],'UW',210,36], ['BU-2026-0619','Konstruksi gedung',[1,1,1,1,0],'PDUK',30,285],
+  ['BU-2026-0054','Kimia',[1,0,1,1,0],'PDUK',62,210], ['BU-2026-0773','Makanan & minuman',[0,1,1,0,1],'UW',118,44],
+  ['BU-2026-1340','Ritel',[1,1,0,1,0],'UW',88,41], ['BU-2026-0230','Tekstil',[0,1,0,1,0],'PDUK',74,150],
+  ['BU-2026-0968','Grosir',[0,0,1,1,0],'UW',55,60], ['BU-2026-0385','Perkebunan sawit',[0,0,1,0,0],'UW',300,70],
+  ['BU-2026-0502','Logam',[1,0,0,0,0],'PDUK',48,118], ['BU-2026-0117','Kertas',[0,0,0,0,0],null,140,102],
+  ['BU-2026-1215','Konstruksi jalan',[0,0,0,0,0],null,64,92], ['BU-2026-0844','Ritel',[0,0,0,0,0],null,22,80],
+];
+const JURI = [
+  ['Robust statistic','|z| > 3 pada RPR & Gap_reg'], ['Isolation Forest','Cepat terisolasi'], ['Local Outlier Factor','Terpencil dari tetangga'],
+  ['One-Class SVM','Di luar batas normal'], ['Autoencoder','Pola sulit direkonstruksi'],
+];
+const JENIS = { PDUK: 'PDUK', UW: 'Under-reporting Wage' };
+const RESULTS = ['Sesuai', 'Perlu klarifikasi', 'Ditemukan ketidaksesuaian'];
+const PEERS = Array.from({ length: 40 }, (_, i) => ({ x: (29 + ((i * 37) % 83) / 83 * 42).toFixed(1) + '%', y: (14 + ((i * 53) % 71) / 71 * 24).toFixed(1) + '%' }));
+const dec = (v, d) => v.toFixed(d).replace('.', ',');
+const pct = (v) => Math.min(Math.max(v, 0), 1) * 100 + '%';
+const fmtRp = (jt) => jt >= 1000 ? 'Rp' + dec(jt / 1000, 1) + ' M' : 'Rp' + Math.round(jt) + ' jt';
+const A = { tagBgUp: 'var(--color-accent-900)', tagUp: 'var(--color-accent-300)', bUp: 'var(--color-accent-800)', tagBg: 'var(--color-neutral-900)', tag: 'var(--color-neutral-300)', b: 'var(--color-neutral-700)' };
+
+class Component extends DCLogic {
+  state = { screen: 'prov', prov: null, pick: null, provQuery: '', year: '2026', q: 'Q2', sector: 'Semua sektor', anomOnly: false, search: '', selId: null, verif: {}, draft: null, note: '', toast: null };
+
+  componentWillUnmount() { clearTimeout(this._tt); }
+
+  base() {
+    if (this._base) return this._base;
+    const used = new Set(RAW.map(r => r[0])), all = RAW.slice();
+    let k = 1;
+    const rnd = (s) => ((Math.sin(k * s) * 10000) % 1 + 1) % 1;
+    GROUPS.forEach(([name, , , n]) => {
+      const g = G[name];
+      for (let i = RAW.filter(r => r[1] === name).length; i < n; i++) {
+        let id; do { id = 'BU-2026-' + String((k * 7919) % 9000 + 1000); k++; } while (used.has(id));
+        used.add(id);
+        all.push([id, name, [0, 0, 0, 0, 0], null, Math.max(3, Math.round(g.med * (0.82 + rnd(12.9) * 0.36))), Math.round(g.medPrw * (0.86 + rnd(78.2) * 0.28))]);
+      }
+    });
+    return (this._base = all);
+  }
+
+  mkRow(r, thr) {
+    const s = this.state, t = this.tier(r, thr), v = s.verif[r.id];
+    return {
+      rank: r.rank, id: r.id, sub: r.sub, hit: r.hit, tier: t.label, tierIcon: t.icon, reg: r.reg,
+      rregTxt: dec(r.reg / r.med, 2), rprTxt: dec(r.prw / r.medPrw, 2),
+      boxes: [0, 1, 2, 3, 4].map(j => { const on = j < r.hit; const c = r.anom ? 'var(--color-accent)' : 'var(--color-neutral-500)'; return { bg: on ? c : 'transparent', border: on ? c : 'var(--color-neutral-700)' }; }),
+      hitColor: r.anom ? 'var(--color-accent-300)' : 'var(--color-neutral-300)',
+      tagBg: t.up ? A.tagBgUp : A.tagBg, tagColor: t.up ? A.tagUp : A.tag, tagBorder: t.up ? A.bUp : A.b,
+      jenis: r.anom && r.jenis ? JENIS[r.jenis] : '—', jenisColor: r.anom ? 'var(--color-neutral-200)' : 'var(--color-neutral-500)',
+      status: v ? v.result : r.anom ? 'Belum diverifikasi' : '—', statusColor: v ? 'var(--color-accent-300)' : 'var(--color-neutral-500)',
+      open: () => { const pv = s.verif[r.id]; this.setState({ screen: 'detail', from: s.screen, selId: r.id, draft: pv ? pv.result : null, note: pv ? pv.note : '' }); this._scrollTop(); },
+    };
+  }
+
+  build(thr) {
+    const list = this.base().map(([id, sub, h, jenis, reg, prw]) => {
+      const g = G[sub]; const hit = h.reduce((a, b) => a + b, 0);
+      return { id, sub, h, jenis, reg, prw, hit, ...g, anom: hit >= thr };
+    }).sort((a, b) => b.hit - a.hit || a.id.localeCompare(b.id));
+    list.forEach((r, i) => { r.rank = i + 1; });
+    return list;
+  }
+
+  tier(r, thr) {
+    if (r.anom) return { label: r.hit >= 5 ? 'Sangat kuat' : r.hit === 4 ? 'Kuat' : 'Terindikasi', icon: 'ph-warning-diamond', up: true };
+    return r.hit > 0 && r.hit === thr - 1 ? { label: 'Daftar pantau', icon: 'ph-eye', up: false } : { label: 'Normal', icon: 'ph-check', up: false };
+  }
+
+  renderVals() {
+    const s = this.state, set = (o) => this.setState(o);
+    const thr = Math.max(1, Math.min(5, Number(this.props.threshold ?? 3)));
+    const list = this.build(thr);
+    const go = (screen) => () => set({ screen: s.prov ? screen : 'prov' });
+    const navDefs = [['dash', 'ph-squares-four', 'Dasbor'], ['peer', 'ph-users-three', 'Peer group'], ['prov', 'ph-map-trifold', 'Pilih provinsi']];
+    const navKey = s.screen === 'detail' ? (s.from === 'group' ? 'peer' : 'dash') : s.screen === 'group' ? 'peer' : s.screen;
+    const nav = navDefs.map(([k, icon, label]) => ({ icon, label, go: go(k), bg: navKey === k ? 'var(--color-accent-900)' : 'transparent', color: navKey === k ? 'var(--color-accent-300)' : 'var(--color-neutral-400)' }));
+
+    const pq = s.provQuery.trim().toLowerCase();
+    const provItems = PROVS.map((name, i) => ({ name, i })).filter(p => !pq || p.name.toLowerCase().includes(pq)).map(({ name, i }) => {
+      const sel = s.pick === name;
+      return { name, count: (120 + (i * 137) % 880).toLocaleString('id-ID'), pick: () => set({ pick: name }), open: () => set({ pick: name, prov: name, screen: 'dash' }),
+        bg: sel ? 'var(--color-accent-900)' : 'var(--color-surface)', border: sel ? 'var(--color-accent)' : 'var(--color-neutral-800)', color: sel ? 'var(--color-accent-200)' : 'var(--color-neutral-200)', icon: sel ? 'var(--color-accent-300)' : 'var(--color-neutral-500)' };
+    });
+
+    const sq = s.search.trim().toLowerCase();
+    const filtered = list.filter(r => (s.sector === 'Semua sektor' || r.sector === s.sector) && (!s.anomOnly || r.anom) && (!sq || r.id.toLowerCase().includes(sq)));
+    const limit = s.limit || 25;
+    const rows = filtered.slice(0, limit).map(r => this.mkRow(r, thr));
+    const moreN = Math.min(25, filtered.length - limit);
+    const segs = [['Semua perusahaan', false], ['Terindikasi anomali', true]].map(([label, val]) => {
+      const on = s.anomOnly === val;
+      return { label, go: () => set({ anomOnly: val }), bg: on ? 'var(--color-accent-900)' : 'transparent', shadow: on ? 'inset 0 0 0 1px var(--color-accent-700)' : 'none', color: on ? 'var(--color-accent-300)' : 'var(--color-neutral-400)' };
+    });
+    const nAnom = list.filter(r => r.anom).length;
+    const listCountLabel = s.anomOnly ? `${filtered.length} terindikasi anomali` : `${filtered.length} badan usaha · ${nAnom} terindikasi`;
+
+    let d = {};
+    const r = list.find(x => x.id === s.selId);
+    if (r) {
+      const t = this.tier(r, thr), v = s.verif[r.id];
+      const rreg = r.reg / r.med, rpr = r.prw / r.medPrw, gap = Math.max(0, 1 - rreg);
+      const px = Math.min(rreg / 2, 1), py = Math.min(rpr / 4, 1);
+      const segC = (j) => r.h[j] ? 'var(--color-accent)' : 'var(--color-neutral-800)';
+      let why, rec, whyTitle;
+      if (r.anom && r.jenis === 'PDUK') {
+        whyTitle = 'Mengapa terindikasi anomali?';
+        why = `Payroll ${fmtRp(r.reg * r.prw)}/tahun setara ±${Math.round(r.reg * rpr)} pekerja menurut median peer, tetapi hanya ${r.reg} yang didaftarkan (Gap_reg ${Math.round(gap * 100)}%). Upah per pekerja ${dec(rpr, 2)}× median peer (RPR). ${r.hit} dari 5 juri menandai pola ini, mengarah pada indikasi pendaftaran pekerja sebagian (PDUK).`;
+        rec = 'audit fisik jumlah tenaga kerja & daftar hadir.';
+      } else if (r.anom) {
+        whyTitle = 'Mengapa terindikasi anomali?';
+        why = `Jumlah pekerja terdaftar sejalan dengan peer (R_reg ${dec(rreg, 2)}), tetapi upah per pekerja hanya ${dec(rpr, 2)}× median peer (RPR). ${r.hit} dari 5 juri menandai pola ini, mengarah pada indikasi pelaporan upah lebih rendah (under-reporting wage).`;
+        rec = 'cocokkan slip gaji & bukti transfer upah dengan upah yang dilaporkan.';
+      } else {
+        whyTitle = 'Belum memenuhi ambang anomali';
+        why = r.hit ? `${r.hit} dari 5 juri menandai badan usaha ini, di bawah ambang ${thr}/5. R_reg ${dec(rreg, 2)} dan RPR ${dec(rpr, 2)} masih dekat dengan median peer group.` : `Tidak ada juri yang menandai. R_reg ${dec(rreg, 2)} dan RPR ${dec(rpr, 2)} berada dalam sebaran normal peer group.`;
+        rec = r.hit ? 'pantau pada kuartal berikutnya.' : 'tidak perlu verifikasi lapangan.';
+      }
+      const mates = list.filter(x => x.sub === r.sub && x.id !== r.id);
+      d = {
+        peerN: mates.length + 1,
+        peers: mates.map(x => ({ x: pct(x.reg / x.med / 2), y: pct(x.prw / x.medPrw / 4) })),
+        id: r.id, rank: r.rank, sub: r.sub, pg: r.pg, hit: r.hit, med: r.med, medPrw: r.medPrw, reg: r.reg, prw: r.prw,
+        tierIcon: t.icon, headTag: t.up && r.jenis ? `${t.label} · indikasi ${JENIS[r.jenis]}` : t.label,
+        tagBg: t.up ? A.tagBgUp : A.tagBg, tagColor: t.up ? A.tagUp : A.tag, tagBorder: t.up ? A.bUp : A.b,
+        hitColor: r.anom ? 'var(--color-accent-300)' : 'var(--color-neutral-300)',
+        seg0: segC(0), seg1: segC(1), seg2: segC(2), seg3: segC(3), seg4: segC(4),
+        juri: JURI.map(([name, w], j) => ({ name, why: r.h[j] ? w : 'Dalam batas normal', icon: r.h[j] ? 'ph-check-circle' : 'ph-minus-circle', iconColor: r.h[j] ? 'var(--color-accent-300)' : 'var(--color-neutral-600)', color: r.h[j] ? 'var(--color-text)' : 'var(--color-neutral-400)' })),
+        rregTxt: dec(rreg, 2), rprTxt: dec(rpr, 2), gapTxt: Math.round(gap * 100) + '%', rregBar: pct(rreg / 2), rprBar: pct(rpr / 4),
+        px: pct(px), py: pct(py), labelShift: px > 0.55 ? 'translateX(calc(-100% - 16px))' : 'translateX(16px)',
+        whyTitle, why, rec,
+        savedLabel: v ? `Tersimpan · ${v.result} · ${v.date}` : 'Belum diverifikasi', savedColor: v ? 'var(--color-accent-300)' : 'var(--color-neutral-400)',
+      };
+    }
+    const results = RESULTS.map(label => {
+      const on = s.draft === label;
+      return { label, go: () => set({ draft: label }), bg: on ? 'var(--color-accent-900)' : 'transparent', shadow: on ? 'inset 0 0 0 1px var(--color-accent-700)' : 'none', color: on ? 'var(--color-accent-300)' : 'var(--color-neutral-400)' };
+    });
+
+    const groups = GROUPS.map(([name, sector, pg, n, med, medPrw]) => {
+      const a = list.filter(x => x.sub === name && x.anom).length;
+      return { name, sector, pg, n, med, medPrw, anomN: a, anom: a ? `${a} BU` : '—', anomColor: a ? 'var(--color-accent-300)' : 'var(--color-neutral-500)', go: () => { set({ screen: 'group', groupName: name }); this._scrollTop(); } };
+    });
+    const gd = groups.find(g => g.name === s.groupName) || {};
+    const members = list.filter(x => x.sub === s.groupName).map(x => this.mkRow(x, thr));
+    const fromGroup = s.from === 'group';
+    const crumb = fromGroup ? `Peer group / ${s.groupName}` : `Dasbor / ${s.prov || ''} · ${s.year} ${s.q} / Rank #${r ? r.rank : ''}`;
+
+    return {
+      appName: this.props.appName ?? 'JagaPPU', thr,
+      nav, prov: s.prov || '', provLabel: s.prov || '—', hasProv: !!s.prov, pillMargin: s.prov ? '0' : 'auto',
+      year: s.year, q: s.q,
+      isProv: s.screen === 'prov', isDash: s.screen === 'dash', isDetail: s.screen === 'detail' && !!r, isPeer: s.screen === 'peer',
+      goProv: () => set({ screen: 'prov', pick: s.prov }), goDash: () => set({ screen: 'dash' }),
+      provQuery: s.provQuery, onProvQuery: (e) => set({ provQuery: e.target.value }), provCount: provItems.length, provItems,
+      pickLabel: s.pick ? `Dipilih: ${s.pick}` : 'Belum ada provinsi dipilih', noPick: !s.pick, openOpacity: s.pick ? 1 : 0.45,
+      openDash: () => s.pick && set({ prov: s.pick, screen: 'dash' }),
+      onYear: (e) => set({ year: e.target.value }), onQ: (e) => set({ q: e.target.value }), sector: s.sector, onSector: (e) => set({ sector: e.target.value, limit: 25 }),
+      search: s.search, onSearch: (e) => set({ search: e.target.value, limit: 25 }),
+      segs, rows, emptyRows: rows.length === 0, listCountLabel,
+      d, peers: PEERS, results, note: s.note, onNote: (e) => set({ note: e.target.value }),
+      noDraft: !s.draft, saveOpacity: s.draft ? 1 : 0.45,
+      save: () => {
+        if (!s.draft || !r) return;
+        const date = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        set({ verif: { ...s.verif, [r.id]: { result: s.draft, note: s.note, date } }, toast: r.id });
+        clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: null }), 3200);
+      },
+      hasMore: moreN > 0, moreLabel: `Tampilkan ${moreN} lagi · ${rows.length} dari ${filtered.length}`, showMore: () => set({ limit: limit + 25 }),
+      isGroup: s.screen === 'group', gd, members, crumb,
+      goBack: () => { set({ screen: fromGroup ? 'group' : 'dash' }); this._scrollTop(); }, goPeer: () => set({ screen: 'peer' }),
+      groups, toast: !!s.toast, toastSub: `${s.toast || ''} · menjadi umpan balik kalibrasi model`,
+    };
+  }
+
+  _scrollTop() { requestAnimationFrame(() => { const el = document.querySelector('main > div'); if (el) el.scrollTop = 0; }); }
+}
+</script>
+</body>
+</html>
